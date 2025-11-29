@@ -1,19 +1,30 @@
 name: 🤖 Bot Keep-Alive 24/7
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'
+  push:
+    branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+concurrency:
+  group: bot-keeper
+  cancel-in-progress: false
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 350
     
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci --legacy-peer-deps
-      - run: timeout 300 node bot.js || true
+      - run: npm install
+      - name: 🚀 Start Bot
+        env:
+          TELEGRAM_BOT_TOKEN: 8365459336:AAG2pS3tJUtO0vGr0iFHu0EtY7NNsUhAjLg
+          PORT: 3030
+          OWNER_ID: 6245574035
+        run: timeout 340m node bot.js || true
